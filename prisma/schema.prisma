@@ -1,0 +1,37 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Tabla para los administradores del catálogo (Login)
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   
+  createdAt DateTime @default(now())
+}
+
+// Categorías de ropa o productos (ej: Blusas, Vestidos, Calzado)
+model Categoria {
+  id        Int        @id @default(autoincrement())
+  nombre    String     @unique
+  slug      String     @unique 
+  productos Producto[]
+}
+
+// Datos de cada artículo individual del catálogo
+model Producto {
+  id          Int       @id @default(autoincrement())
+  nombre      String
+  descripcion String    @db.Text
+  precio      Decimal   @db.Decimal(10, 2)
+  imagenUrl   String    
+  disponible  Boolean   @default(true)
+  categoriaId Int
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  createdAt   DateTime  @default(now())
+}

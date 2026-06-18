@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kilyad CREACIONES</title>
+    <!-- Tailwind CSS Oficial -->
+    <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Inyección prioritaria de funciones para los Modales -->
+    <script>
+        function abrirModalDetalle(id, nombre, descripcion, precio, imagenUrl, categoria) {
+            const modal = document.getElementById('modal-detalle');
+            if (!modal) return;
+            
+            document.getElementById('det-imagen').src = imagenUrl;
+            document.getElementById('det-imagen').alt = nombre;
+            document.getElementById('det-nombre').innerText = nombre;
+            document.getElementById('det-categoria').innerText = categoria;
+            document.getElementById('det-precio').innerText = `$${precio.toFixed(2)}`;
+            document.getElementById('det-descripcion').innerText = descripcion;
+
+            document.getElementById('det-contenedor-boton').innerHTML = `
+                <button onclick="agregarAlCarrito(${id}, '${nombre.replace(/'/g, "\\'")}', ${precio}, '${imagenUrl}'); cerrarModalDetalle();" class="w-full bg-pink-600 text-white py-3 rounded-xl font-bold hover:bg-pink-700 transition flex items-center justify-center gap-2 shadow-md active:scale-95">
+                    <span>Añadir al Carrito</span> <span>🛒</span>
+                </button>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function cerrarModalDetalle() {
+            const modal = document.getElementById('modal-detalle');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+
+    <!-- ================= BLOCK 1: HEADER PRINCIPAL (LOGO, BUSCADOR, CARRITO) ================= -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo e Identidad -->
+            <!-- Logo e Identidad con tu Imagen Real -->
+            <div class="flex items-center gap-3">
+                <!-- El servidor leerá directo tu archivo desde la carpeta public -->
+                <img src="/logo2.png" alt="Logo Trendy Colors" class="w-22 h-16 object-contain rounded-xl shadow-sm bg-slate-50">
+                <div>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight leading-none">Kilyad CREACIONES</h1>
+                    <span class="text-xs font-medium text-slate-400">Catálogo de productos</span>
+                </div>
+            </div>
+
+
+            <!-- Buscador Central -->
+            <div class="flex-1 max-w-md hidden md:block">
+                <div class="relative">
+                    <input type="text" placeholder="Buscar productos..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:bg-white transition-all">
+                    <span class="absolute right-3 top-2.5 text-slate-400">🔍</span>
+                </div>
+            </div>
+            <!-- Carrito e Indicador de Productos -->
+            <div class="flex items-center gap-6">
+                <div class="text-right hidden sm:block">
+                    <span class="text-sm font-bold text-slate-700 block"><%= productos.length %> productos</span>
+                </div>
+                
+                <!-- Botón de Carrito Estilizado con evento para abrir la ventana en el futuro -->
+                <div onclick="abrirModalCarrito()" class="relative bg-slate-100 p-2.5 rounded-xl hover:bg-slate-200 transition cursor-pointer flex items-center gap-2">
+                    <span class="text-xl">🛒</span>
+                    <span class="text-sm font-bold text-slate-700 hidden sm:inline">Carrito</span>
+                    <!-- Globo Rojo Dinámico (Ya lee el script) -->
+                    <span id="contador-carrito" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">0</span>
+                </div>
+            </div>
+
+
+        </div>
+    </header>
+    
+        <!-- ================= BLOCK 2: BANNER HERO CON MEDIDAS ADAPTABLES CORREGIDO ================= -->
+    <section class="relative w-full bg-slate-900 overflow-hidden shadow-sm mb-9">
+        
+        <!-- Diapositiva 1 (Arranca visible con opacity-100) -->
+        <div id="slide-1" class="relative w-full transition-opacity duration-1000 opacity-100 z-10 block">
+            <img src="/ban1.png" class="w-full h-auto max-h-[400px] object-cover opacity-90">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-wider mb-2 drop-shadow-md">CATÁLOGO 2026</h2>
+                <p class="text-pink-400 font-bold tracking-widest text-xs md:text-sm uppercase bg-slate-950/40 px-3 py-1 rounded-full backdrop-blur-sm">Nueva Temporada / Tendencias Exclusivas</p>
+            </div>
+        </div>
+
+        <!-- Diapositiva 2 (Corregido: Se quitó 'hidden', se cambió a 'absolute' y se controla con opacity-0) -->
+        <div id="slide-2" class="absolute inset-0 w-full h-full transition-opacity duration-1000 opacity-0 z-5">
+            <img src="/ban2.png" class="w-full h-full object-cover opacity-90">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-wider mb-2 drop-shadow-md">NOVEDADES DE LA SEMANA</h2>
+                <p class="text-sky-400 font-bold tracking-widest text-xs md:text-sm uppercase bg-slate-950/40 px-3 py-1 rounded-full backdrop-blur-sm">pregunta por nuestras promociones</p>
+            </div>
+        </div>
+
+        <!-- Diapositiva 3 (Corregido: Se quitó 'hidden' y se controla con opacity-0) -->
+        <div id="slide-3" class="absolute inset-0 w-full h-full transition-opacity duration-1000 opacity-0 z-5">
+            <img src="/ban3.png" class="w-full h-full object-cover opacity-90" onerror="this.src='/ban3.png'">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-wider mb-2 drop-shadow-md">LO MÁS VENDIDO</h2>
+                <p class="text-emerald-400 font-bold tracking-widest text-xs md:text-sm uppercase bg-slate-950/40 px-3 py-1 rounded-full backdrop-blur-sm">Los favoritos de nuestra comunidad</p>
+            </div>
+        </div>
+
+        <!-- Controles Inferiores (Puntitos del Carrusel) -->
+        <div class="absolute bottom-4 w-full flex justify-center gap-2 z-30">
+            <button onclick="cambiarSlide(1)" id="dot-1" class="w-2.5 h-2.5 rounded-full bg-white transition-all"></button>
+            <button onclick="cambiarSlide(2)" id="dot-2" class="w-2.5 h-2.5 rounded-full bg-white/40 transition-all"></button>
+            <button onclick="cambiarSlide(3)" id="dot-3" class="w-2.5 h-2.5 rounded-full bg-white/40 transition-all"></button>
+        </div>
+    </section>
+
+
+    <!-- ================= BLOCK 3: BARRA DE CATEGORÍAS HORIZONTAL CON SCROLL ================= -->
+    <nav class="bg-sky-100/60 backdrop-blur-md border-b border-sky-200/40 sticky top-20 z-40 py-3.5 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 flex items-center gap-4 overflow-x-auto no-scrollbar scroll-smooth">
+            
+            <span class="text-xs font-black text-slate-500 uppercase tracking-wider whitespace-nowrap">Categorías:</span>
+            
+            <!-- Botón Todos -->
+            <a href="/catalogo" class="px-5 py-2 rounded-full text-sm font-bold border transition-all whitespace-nowrap <%= !categoriaSeleccionada ? 'bg-pink-600 text-white border-pink-600 shadow-md shadow-pink-100' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300' %>">
+                Todos
+            </a>
+            
+            <!-- Mapeo de Categorías Reales desde Hostinger -->
+            <% categorias.forEach(cat => { %>
+                <a href="/catalogo?categoria=<%= cat.slug %>" class="px-5 py-2 rounded-full text-sm font-bold border transition-all whitespace-nowrap <%= categoriaSeleccionada === cat.slug ? 'bg-pink-600 text-white border-pink-600 shadow-md shadow-pink-100' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300' %>">
+                    <%= cat.nombre %>
+                </a>
+            <% }) %>
+
+        </div>
+    </nav>
+
+    <!-- ================= BLOCK 4: SECCIÓN DE PRODUCTOS (GRILLA DINÁMICA) ================= -->
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            
+                        <% productos.forEach(prod => { %>
+                <!-- Se agregó 'cursor-pointer' para que el mouse cambie a una manita al pasar sobre la tarjeta -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer">
+                    
+                    <!-- 👁️ PASO A: Todo este bloque de arriba reaccionará al clic para abrir la ventana de detalles -->
+                    <div onclick="abrirModalDetalle(<%= prod.id %>, '<%= prod.nombre.replace(/'/g, "\\'") %>', '<%= prod.descripcion.replace(/'/g, "\\'").replace(/\n/g, ' ') %>', <%= prod.precio %>, '<%= prod.imagenUrl %>', '<%= prod.categoria.nombre %>')" class="flex-grow">
+                        <!-- Imagen con efecto zoom al pasar el cursor -->
+                        <div class="w-full h-64 bg-slate-50 overflow-hidden relative">
+                            <img src="<%= prod.imagenUrl %>" alt="<%= prod.nombre %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co'">
+                            <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-pink-600 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm border border-pink-50">
+                                <%= prod.categoria.nombre %>
+                            </span>
+                        </div>
+
+                        <!-- Datos de la Prenda / Artesanía -->
+                        <div class="p-4">
+                            <h3 class="font-bold text-slate-900 text-base line-clamp-1 group-hover:text-pink-600 transition-colors"><%= prod.nombre %></h3>
+                            <p class="text-slate-400 text-xs mt-1 line-clamp-2 leading-relaxed"><%= prod.descripcion %></p>
+                        </div>
+                    </div>
+
+                    <!-- Precio y Botón de Carrito Verde (Queda fuera del div del clic para que puedas añadir sin abrir la ventana por error) -->
+                    <div class="p-4 pt-0 flex items-center justify-between border-t border-slate-50 mt-2 pt-4">
+                        <span class="text-xl font-black text-slate-900 tracking-tight">$<%= prod.precio %></span>
+                        
+                        <!-- 🛒 PASO B: Botón corregido incluyendo el parámetro de la imagenUrl para que se vea en el carrito -->
+                        <!-- Botón Verde Actualizado con Inyección Forzada de la Foto de tu Mac -->
+                    <button onclick="agregarAlCarrito(<%= prod.id %>, '<%= prod.nombre.replace(/'/g, "\\'") %>', <%= prod.precio %>, '<%= prod.imagenUrl ? prod.imagenUrl : '/logo2.png' %>')" class="bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition shadow-sm flex items-center gap-1.5 active:scale-95">
+                        <span>Añadir</span> <span>🛒</span>
+                    </button>
+
+                    </div>
+
+                </div>
+            <% }) %>
+
+
+        </div>
+    </main>
+<!-- ================= VENTANA FLOTANTE DEL CARRITO (MODAL) ================= -->
+<div id="modal-carrito" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[85vh]">
+        
+        <!-- Encabezado de la Ventana -->
+        <div class="bg-slate-900 p-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🛒</span>
+                <h3 class="font-black text-lg">Mi Pedido</h3>
+            </div>
+            <button onclick="cerrarModalCarrito()" class="text-slate-400 hover:text-white text-xl font-bold bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+        </div>
+
+        <!-- Lista de Productos en el Carrito (Contenedor Dinámico) -->
+        <div id="lista-carrito-items" class="p-4 flex-1 overflow-y-auto divide-y divide-slate-100 space-y-3 no-scrollbar">
+            <!-- JavaScript llenará esta sección automáticamente -->
+        </div>
+
+        <!-- Total y Botón de Enviar a WhatsApp -->
+        <div class="p-4 bg-slate-50 border-t border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">Total estimado:</span>
+                <span id="total-carrito-dinero" class="text-2xl font-black text-slate-900">$0.00</span>
+            </div>
+            
+            <button onclick="enviarPedidoWhatsApp()" class="w-full bg-emerald-500 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-600 transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-100 active:scale-[0.98]">
+                <span>Confirmar Pedido por WhatsApp</span> <span>📱</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+    <!-- ================= SCRIPT PARA MOVER EL CARRUSEL AUTOMÁTICAMENTE ================= -->
+       <!-- ================= SCRIPT PARA MOVER EL CARRUSEL AUTOMÁTICAMENTE ================= -->
+    <script>
+        let currentSlide = 1;
+        
+        function cambiarSlide(num) {
+            currentSlide = num;
+            for (let i = 1; i <= 3; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === num) {
+                    if (slide) {
+                        slide.classList.remove('opacity-0');
+                        slide.classList.add('opacity-100');
+                    }
+                    if (dot) {
+                        dot.classList.remove('bg-white/40');
+                        dot.classList.add('bg-white');
+                    }
+                } else {
+                    if (slide) {
+                        slide.classList.remove('opacity-100');
+                        slide.classList.add('opacity-0');
+                    }
+                    if (dot) {
+                        dot.classList.remove('bg-white');
+                        dot.classList.add('bg-white/40');
+                    }
+                }
+            }
+        }
+
+        // Carrusel automático cada 4 segundos
+        setInterval(() => {
+            currentSlide = currentSlide === 3 ? 1 : currentSlide + 1;
+            cambiarSlide(currentSlide);
+        }, 4000);
+    </script>
+  
+<!-- ================= LÓGICA INTERACTIVA COMPLETA DEL CARRITO ================= -->
+<script>
+    // Inicializamos el carrito leyendo la Mac del cliente
+    let carrito = JSON.parse(localStorage.getItem('trendy_carrito')) || [];
+    actualizarGloboCarrito();
+
+        function agregarAlCarrito(id, nombre, precio, imagenUrl) {
+        // ＋ PASO 1: Ahora la función ya acepta el cuarto parámetro (imagenUrl)
+        const productoExistente = carrito.find(item => item.id === id);
+        
+        if (productoExistente) {
+            productoExistente.cantidad += 1;
+        } else {
+            // ＋ PASO 2: Aquí ya guardamos de forma obligatoria la ruta de la foto en la memoria
+            const fotoFinal = (imagenUrl && imagenUrl !== 'undefined') ? imagenUrl : '/logo2.png';
+            carrito.push({ id, nombre, precio, imagenUrl: fotoFinal, cantidad: 1 });
+        }
+        guardarCarritoYActualizar();
+    }
+
+
+    function guardarCarritoYActualizar() {
+        localStorage.setItem('trendy_carrito', JSON.stringify(carrito));
+        actualizarGloboCarrito();
+        if (!document.getElementById('modal-carrito').classList.contains('hidden')) {
+            renderizarItemsCarrito();
+        }
+    }
+
+    function actualizarGloboCarrito() {
+        const contador = document.getElementById('contador-carrito');
+        if (contador) {
+            const totalPrendas = carrito.reduce((total, item) => total + item.cantidad, 0);
+            contador.innerText = totalPrendas;
+        }
+    }
+
+    // --- FUNCIONES PARA ABRIR Y CERRAR LA VENTANA MODAL ---
+    function abrirModalCarrito() {
+        const modal = document.getElementById('modal-carrito');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        renderizarItemsCarrito();
+    }
+
+    function cerrarModalCarrito() {
+        const modal = document.getElementById('modal-carrito');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+    }
+
+    // --- RENDERIZAR LA LISTA CON BOTONES + Y - ---
+        function renderizarItemsCarrito() {
+            const contenedor = document.getElementById('lista-carrito-items');
+            const txtTotal = document.getElementById('total-carrito-dinero');
+            
+            if (carrito.length === 0) {
+                contenedor.innerHTML = `<div class="text-center py-8 text-slate-400 font-medium flex flex-col items-center gap-2"><span>🛍️</span><span>Tu carrito está vacío.</span></div>`;
+                txtTotal.innerText = "$0.00";
+                return;
+            }
+
+            let html = '';
+            let granTotal = 0;
+            carrito.forEach((item, index) => {
+                const subtotal = item.precio * item.cantidad;
+                granTotal += subtotal;
+                
+                // 📷 CORRECCIÓN: Si no hay ruta guardada, cargamos por defecto tu logo local en lugar de pedir una URL externa
+                const fotoUrl = item.imagenUrl || '/logo2.png';
+                
+                html += `
+                <div class="flex items-center justify-between py-3 first:pt-0 gap-3">
+                    <!-- 📷 El disparador onerror ahora también llama a tu logo local, eliminando las peticiones bloqueadas por CORB -->
+                    <img src="${fotoUrl}" class="w-12 h-12 object-cover rounded-lg border border-slate-100 bg-slate-50 flex-shrink-0" onerror="this.src='/logo2.png'">
+                    
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-slate-900 text-sm leading-tight truncate">${item.nombre}</h4>
+                        <span class="text-xs text-slate-400 block mt-0.5">$${item.precio} c/u</span>
+                    </div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <div class="flex items-center border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
+                            <button onclick="cambiarCantidad(${index}, -1)" class="px-2.5 py-1 text-slate-500 hover:bg-slate-200 font-bold transition text-sm">-</button>
+                            <span class="px-2 font-black text-slate-800 text-sm">${item.cantidad}</span>
+                            <button onclick="cambiarCantidad(${index}, 1)" class="px-2.5 py-1 text-slate-500 hover:bg-slate-200 font-bold transition text-sm">+</button>
+                        </div>
+                        <span class="text-sm font-black text-slate-900 w-16 text-right">$${subtotal.toFixed(2)}</span>
+                    </div>
+                </div>`;
+            });
+            contenedor.innerHTML = html;
+            txtTotal.innerText = `$${granTotal.toFixed(2)}`;
+        }
+
+
+    function cambiarCantidad(index, cambio) {
+        carrito[index].cantidad += cambio;
+        // Si la cantidad llega a 0, eliminamos la prenda por completo del arreglo
+        if (carrito[index].cantidad <= 0) {
+            carrito.splice(index, 1);
+        }
+        guardarCarritoYActualizar();
+    }
+
+       // --- ENVIAR NOTIFICACIÓN CON EL PEDIDO EN TEXTO LIMPIO A WHATSAPP ---
+        // --- ENVIAR NOTIFICACIÓN CON EL PEDIDO EN TEXTO LIMPIO A WHATSAPP ---
+        // --- ENVIAR NOTIFICACIÓN CON EL PEDIDO EN TEXTO LIMPIO A WHATSAPP ---
+    function enviarPedidoWhatsApp() {
+        if (carrito.length === 0) return alert('Agrega productos primero antes de hacer tu pedido.');
+        
+        // Tu número de celular está perfecto aquí
+        const miTelefono = "522216050287"; 
+        
+        let mensaje = `🛍️ *NUEVO PEDIDO - TRENDY COLORS*\n`;
+        mensaje += `=========================\n\n`;
+        
+        let total = 0;
+        carrito.forEach(item => {
+            const subtotal = item.precio * item.cantidad;
+            total += subtotal;
+            mensaje += `🔹 *${item.cantidad}x* ${item.nombre} - _$${item.precio} c/u_\n`;
+            mensaje += `   *Subtotal:* $${subtotal.toFixed(2)}\n\n`;
+        });
+        
+        mensaje += `=========================\n`;
+        mensaje += `💰 *TOTAL A PAGAR:* $${total.toFixed(2)}\n\n`;
+        mensaje += `¿Me podrían confirmar disponibilidad, por favor? ✨`;
+
+        // 🟢 CORRECCIÓN REAL: Ya lleva la diagonal después del .me/ para que el enlace sea válido
+        const urlWhatsApp = "https://wa.me/" + miTelefono + "?text=" + encodeURIComponent(mensaje);
+        
+        // Abre la pestaña de WhatsApp de golpe en tu Chrome
+        window.open(urlWhatsApp, '_blank');
+    }
+
+
+</script>
+
+
+
+    <!-- ESTILOS CSS EXTRA PARA OCULTAR LAS BARRAS DE SCROLL FEAS DE LAS CATEGORÍAS -->
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+    <!-- ================= BOTÓN FLOTANTE DE WHATSAPP ================= -->
+      <!-- ================= BOTÓN FLOTANTE DE WHATSAPP ACTUALIZADO ================= -->
+      <!-- ================= BOTÓN FLOTANTE DE WHATSAPP DEFINITIVO ================= -->
+    <a href="https://wa.me/522216050287"
+        target="_blank"
+        class="fixed bottom-6 right-6 bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 active:scale-95 group"
+        style="z-index: 9999;"
+        title="Escríbenos por WhatsApp">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="w-7 h-7 filter drop-shadow-sm group-hover:rotate-12 transition-transform"
+                fill="currentColor"
+                viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.149-.198.297-.768.967-.941 1.164-.173.198-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.496.099-.198.05-.372-.025-.521-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479s1.065 2.875 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            </svg>
+        </a>
+
+<!-- ================= VENTANA FLOTANTE DE DETALLE DE PRODUCTO (MODAL) ================= -->
+<div id="modal-detalle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[999] hidden items-center justify-center p-4 transition-all duration-300">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col md:flex-row max-h-[90vh]">
+        
+        <!-- Botón Cerrar Flotante para Celulares -->
+        <button onclick="cerrarModalDetalle()" class="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold z-50 md:hidden">✕</button>
+
+        <!-- Lado Izquierdo: Imagen Completa -->
+        <div class="w-full md:w-1/2 h-64 md:h-auto bg-slate-50 relative">
+            <img id="det-imagen" src="" alt="" class="w-full h-full object-cover">
+            <span id="det-categoria" class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-pink-600 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm border border-pink-50"></span>
+        </div>
+
+        <!-- Lado Derecho: Textos y Datos -->
+        <div class="w-full md:w-1/2 p-6 flex flex-col justify-between bg-white relative">
+            <!-- Botón Cerrar para Computadora -->
+            <button onclick="cerrarModalDetalle()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-sm font-bold hidden md:block bg-slate-100 px-2.5 py-1 rounded-lg transition">Cerrar ✕</button>
+            
+            <div class="mt-4 md:mt-6 flex-grow">
+                <h3 id="det-nombre" class="font-black text-slate-900 text-2xl tracking-tight leading-tight"></h3>
+                <div id="det-precio" class="text-2xl font-black text-pink-600 mt-2"></div>
+                
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-6 mb-1">Descripción del producto:</h4>
+                <p id="det-descripcion" class="text-slate-600 text-sm leading-relaxed overflow-y-auto max-h-[180px] pr-1 no-scrollbar"></p>
+            </div>
+
+            <!-- Acción de Compra -->
+            <div class="pt-6 border-t border-slate-100 mt-4 flex gap-2" id="det-contenedor-boton">
+                <!-- Se inyectará el botón dinámicamente vía JS -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>
+
