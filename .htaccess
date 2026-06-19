@@ -1,13 +1,10 @@
-# ================= CONFIGURACIÓN INTEGRAL NODE.JS PARA HOSTINGER =================
+# ================= CONFIGURACIÓN DE PROXY INVERSO DEFINITIVO =================
 RewriteEngine On
 
-# 1. EXCLUSIÓN CLAVE: Si la petición busca un archivo real (como fotos, logos o favicons), no toques a Node
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# 2. Si entran a la raíz de tu dominio, los mandamos directo a la ruta del catálogo
+# 1. Forzar que si entran a la raíz de casveltech.online los mande al catálogo de Node.js
 RewriteRule ^$ http://127.0.0 [P,L]
 
-# 3. El resto de las peticiones dinámicas de vistas se van al puerto 3000
+# 2. Permitir que Express sirva de forma nativa tus carpetas físicas (CSS, logos, uploads) sin tocar a Node
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ http://127.0.0 [P,L]
