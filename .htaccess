@@ -1,10 +1,9 @@
-# ================= CONFIGURACIÓN DE PROXY INVERSO DEFINITIVO =================
+# ================= CONFIGURACIÓN INTEGRAL NODE.JS HOSTINGER =================
+PassengerEnabled on
+PassengerAppType node
+PassengerStartupFile app.js
+
 RewriteEngine On
-
-# 1. Forzar que si entran a la raíz de casveltech.online los mande al catálogo de Node.js
-RewriteRule ^$ http://127.0.0 [P,L]
-
-# 2. Permitir que Express sirva de forma nativa tus carpetas físicas (CSS, logos, uploads) sin tocar a Node
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ http://127.0.0 [P,L]
+RewriteRule ^(.*)$ app.js/$1 [QSA,L]
