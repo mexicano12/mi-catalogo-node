@@ -41,7 +41,7 @@ app.set('views', path.join(__dirname, 'views'));
 // 1. Servir archivos estáticos generales de la carpeta public (CSS, logos)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 2. 🟢 LA LÍNEA GANADORA: Fuerza a Express a servir la carpeta de subidas de forma directa y limpia
+// 2. Fuerza a Express a servir la carpeta de subidas de forma directa y limpia
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // Procesar datos de formularios HTMLs
@@ -60,15 +60,15 @@ function verificarAdmin(req, res, next) {
     res.redirect('/admin/login');
 }
 
-// 🟢 CORRECCIÓN 1: Redirección de la raíz blindada para que el subdirectorio de Hostinger no se rompa
-app.get(['/', '/catalogo/'], (req, res) => {
+// 🟢 CORRECCIÓN 1: Redirección limpia sin bucles. Solo mandamos a /catalogo si entran a la raíz pura.
+app.get('/', (req, res) => {
     res.redirect('/catalogo');
 });
 
 // ================= VISTAS PÚBLICAS (CLIENTES) =================
 
-// 🟢 CORRECCIÓN 2: Catálogo Principal con rutas combinadas para evitar el error 404 del subdirectorio proxy
-app.get(['/catalogo', '/catalogo/catalogo'], async (req, res) => {
+// 🟢 CORRECCIÓN 2: El catálogo ahora absorbe y tolera cualquier diagonal o proxy que meta Passenger sin marearse
+app.get(['/catalogo', '/catalogo/', '/catalogo/catalogo'], async (req, res) => {
     try {
         const { categoria } = req.query;
         const annotations = await prisma.categoria.findMany();
@@ -85,7 +85,7 @@ app.get(['/catalogo', '/catalogo/catalogo'], async (req, res) => {
                 include: { categoria: true }
             });
         }
-        res.render('catalogo', { productos, categorias: annotations, categoriaSeleccionada: categoria });
+        res.render('catalogo', { productos, categories: annotations, categoriaSeleccionada: categoria });
     } catch (error) {
         console.error("❌ Error en la ruta del catálogo:", error);
         res.status(500).send("Error al cargar el catálogo");
@@ -94,7 +94,7 @@ app.get(['/catalogo', '/catalogo/catalogo'], async (req, res) => {
 
 // ================= VISTAS PRIVADAS (ADMINISTRADOR) =================
 
-// Pantalla de Login (Rutas combinadas para producción)
+// Pantalla de Login
 app.get(['/admin/login', '/catalogo/admin/login'], (req, res) => {
     res.render('admin/login', { error: null });
 });
@@ -132,13 +132,11 @@ app.get(['/admin/productos/crear', '/catalogo/admin/productos/crear'], verificar
     res.render('admin/productos/crear', { categorias: categories });
 });
 
-// Guardar Producto Nuevo (Modificado para procesar el archivo físico adjunto de forma segura)
+// Guardar Producto Nuevo
 app.post('/admin/productos/crear', verificarAdmin, upload.single('imagen'), async (req, res) => {
     const { nombre, descripcion, precio, categoriaId } = req.body;
     try {
         console.log("🕵️‍♂️ Archivo recibido por Multer al crear:", req.file);
-
-        // Eliminamos el enlace roto externo y asignamos tu logo local para evitar bloqueos CORB
         const imagenUrl = req.file ? `/uploads/${req.file.filename}` : '/logo2.png';
 
         await prisma.producto.create({
@@ -156,7 +154,7 @@ app.post('/admin/productos/crear', verificarAdmin, upload.single('imagen'), asyn
     }
 });
 
-// 📝 INTEGRACIÓN: RUTA PARA MOSTRAR LA PANTALLA DE EDITAR PRODUCTO
+// Mostrar la pantalla de editar producto
 app.get(['/admin/productos/editar/:id', '/catalogo/admin/productos/editar/:id'], verificarAdmin, async (req, res) => {
     try {
         const product = await prisma.producto.findUnique({
@@ -169,14 +167,12 @@ app.get(['/admin/productos/editar/:id', '/catalogo/admin/productos/editar/:id'],
     }
 });
 
-// 💾 INTEGRACIÓN: RUTA PARA GUARDAR LA EDICIÓN DEL PRODUCTO (PROCESAR CAMBIOS)
+// Guardar la edición del producto
 app.post('/admin/productos/editar/:id', verificarAdmin, upload.single('imagen'), async (req, res) => {
     const { nombre, descripcion, precio, categoriaId } = req.body;
     try {
         console.log("🕵️‍♂️ Archivo recibido por Multer al editar:", req.file);
         const productoActual = await prisma.producto.findUnique({ where: { id: parseInt(req.params.id) } });
-        
-        // Si el usuario subió una foto nueva, la usamos; si no, dejamos la que ya tenía guardada
         const imagenUrl = req.file ? `/uploads/${req.file.filename}` : productoActual.imagenUrl;
 
         await prisma.producto.update({
@@ -202,7 +198,7 @@ app.get('/admin/productos/eliminar/:id', verificarAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
-// Mantener el proceso vivo escuchando en el puerto 3000
+// Escuchar puerto
 app.listen(PORT, () => {
     console.log(`🚀 Catálogo corriendo en http://localhost:${PORT}`);
 });
