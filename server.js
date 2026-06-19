@@ -60,15 +60,15 @@ function verificarAdmin(req, res, next) {
     res.redirect('/admin/login');
 }
 
-// Redireccionar la página raíz directamente al catálogo
-app.get('/', (req, res) => {
+// 🟢 CORRECCIÓN 1: Redirección de la raíz blindada para que el subdirectorio de Hostinger no se rompa
+app.get(['/', '/catalogo/'], (req, res) => {
     res.redirect('/catalogo');
 });
 
 // ================= VISTAS PÚBLICAS (CLIENTES) =================
 
-// Catálogo Principal
-app.get('/catalogo', async (req, res) => {
+// 🟢 CORRECCIÓN 2: Catálogo Principal con rutas combinadas para evitar el error 404 del subdirectorio proxy
+app.get(['/catalogo', '/catalogo/catalogo'], async (req, res) => {
     try {
         const { categoria } = req.query;
         const annotations = await prisma.categoria.findMany();
@@ -87,15 +87,15 @@ app.get('/catalogo', async (req, res) => {
         }
         res.render('catalogo', { productos, categorias: annotations, categoriaSeleccionada: categoria });
     } catch (error) {
-        console.error(error);
+        console.error("❌ Error en la ruta del catálogo:", error);
         res.status(500).send("Error al cargar el catálogo");
     }
 });
 
 // ================= VISTAS PRIVADAS (ADMINISTRADOR) =================
 
-// Pantalla de Login
-app.get('/admin/login', (req, res) => {
+// Pantalla de Login (Rutas combinadas para producción)
+app.get(['/admin/login', '/catalogo/admin/login'], (req, res) => {
     res.render('admin/login', { error: null });
 });
 
@@ -121,13 +121,13 @@ app.get('/admin/logout', (req, res) => {
 });
 
 // Panel Principal (CRUD)
-app.get('/admin/dashboard', verificarAdmin, async (req, res) => {
+app.get(['/admin/dashboard', '/catalogo/admin/dashboard'], verificarAdmin, async (req, res) => {
     const productos = await prisma.producto.findMany({ include: { categoria: true } });
     res.render('admin/dashboard', { productos });
 });
 
 // Crear Producto (Formulario)
-app.get('/admin/productos/crear', verificarAdmin, async (req, res) => {
+app.get(['/admin/productos/crear', '/catalogo/admin/productos/crear'], verificarAdmin, async (req, res) => {
     const categories = await prisma.categoria.findMany();
     res.render('admin/productos/crear', { categorias: categories });
 });
@@ -157,7 +157,7 @@ app.post('/admin/productos/crear', verificarAdmin, upload.single('imagen'), asyn
 });
 
 // 📝 INTEGRACIÓN: RUTA PARA MOSTRAR LA PANTALLA DE EDITAR PRODUCTO
-app.get('/admin/productos/editar/:id', verificarAdmin, async (req, res) => {
+app.get(['/admin/productos/editar/:id', '/catalogo/admin/productos/editar/:id'], verificarAdmin, async (req, res) => {
     try {
         const product = await prisma.producto.findUnique({
             where: { id: parseInt(req.params.id) }
