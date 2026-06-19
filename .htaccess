@@ -1,5 +1,13 @@
+# ================= CONFIGURACIÓN INTEGRAL NODE.JS PARA HOSTINGER =================
 RewriteEngine On
+
+# 1. EXCLUSIÓN CLAVE: Si la petición busca un archivo real (como fotos, logos o favicons), no toques a Node
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 2. Si entran a la raíz de tu dominio, los mandamos directo a la ruta del catálogo
 RewriteRule ^$ http://127.0.0 [P,L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+
+# 3. El resto de las peticiones dinámicas de vistas se van al puerto 3000
 RewriteRule ^(.*)$ http://127.0.0 [P,L]
