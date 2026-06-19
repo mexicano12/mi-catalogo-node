@@ -85,7 +85,8 @@ app.get(['/catalogo', '/catalogo/', '/catalogo/catalogo'], async (req, res) => {
                 include: { categoria: true }
             });
         }
-        res.render('catalogo', { productos, categories: annotations, categoriaSeleccionada: categoria });
+// 🟢 CORRECCIÓN DEFINITIVA: Cambiamos "categories" por "categorias" para que haga match con tu HTML
+res.render('catalogo', { productos, categorias: annotations, categoriaSeleccionada: categoria });
     } catch (error) {
         console.error("❌ Error en la ruta del catálogo:", error);
         res.status(500).send("Error al cargar el catálogo");
